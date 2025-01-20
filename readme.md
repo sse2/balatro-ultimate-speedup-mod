@@ -2,6 +2,7 @@
 
 # A mod that speeds up everything* in Balatro.
 **except sound because that would be weird*
+
 Are you tired of downloading a bunch of animation speed-up animations? Do you watch all of your YouTube content in 2x because you have no attention span? Do you just want to *go fast:tm:*? This is the mod for you, then. This mod speeds up (or slows down) the entire game to your desired value.
 
 ## Instructions (Windows ONLY!)
