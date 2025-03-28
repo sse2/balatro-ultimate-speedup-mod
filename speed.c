@@ -99,6 +99,7 @@ LUASTEAM_EXPORT ( luasteam_uint64ToString );
 LUASTEAM_EXPORT ( luasteam_uploadLeaderboardScore );
 
 float g_mult = 2.0f;
+int g_async_key = 0;
 
 void get_multiplier_from_file ( )
 {
@@ -106,7 +107,14 @@ void get_multiplier_from_file ( )
  if ( !f )
   return;
 
- fscanf_s ( f, "%f", &g_mult );
+ int r = fscanf_s ( f, "%f", &g_mult );
+ if ( r != 1 )
+  g_mult = 2.0f;
+
+ r = fscanf_s ( f, "%x", &g_async_key );
+ if ( r != 1 )
+  g_async_key = 0;
+
  fclose ( f );
 }
 
@@ -115,13 +123,29 @@ queryperfcounter_kind *o_queryperfcounter = QueryPerformanceCounter;
 
 BOOL WINAPI hk_queryperfcounter ( LARGE_INTEGER *lpPerformanceCount )
 {
- static LARGE_INTEGER freq;
+ static LARGE_INTEGER freq = { 0 };
+ static double accum = 0.0;
+ static double last_real_seconds = 0.0;
+
  if ( !freq.QuadPart )
   o_queryperfcounter ( &freq );
 
- BOOL res = o_queryperfcounter ( lpPerformanceCount );
- lpPerformanceCount->QuadPart = ( LONGLONG ) ( ( double ) ( lpPerformanceCount->QuadPart ) * g_mult );
- return res;
+ LARGE_INTEGER current_time;
+ o_queryperfcounter ( &current_time );
+
+ float mult = 1.f;
+ if ( g_async_key && GetAsyncKeyState ( g_async_key ) )
+  mult = g_mult;
+
+ LONGLONG real_delta = current_time.QuadPart - freq.QuadPart;
+ double real_seconds = ( double ) real_delta / ( double ) freq.QuadPart;
+ double frame_delta = real_seconds - last_real_seconds;
+
+ accum += frame_delta * mult;
+ last_real_seconds = real_seconds;
+ lpPerformanceCount->QuadPart = freq.QuadPart + ( LONGLONG ) ( accum * ( double ) freq.QuadPart );
+
+ return TRUE;
 }
 
 void init ( )

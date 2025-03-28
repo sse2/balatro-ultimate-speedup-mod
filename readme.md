@@ -10,7 +10,8 @@ Are you tired of downloading a bunch of animation speed-up animations? Do you wa
 - Go to your Balatro install folder
 - Rename `luasteam.dll` to `luasteam.original.dll`
 - Extract the latest release in your Balatro folder.
-- (Optional) Modify `speedhax.cfg` to your desired value. (Default is `2.0`. If you go too overboard your game might fail to boot or just crash.)
+- Modify `speedhax.cfg` to your desired value. (Default is `2.0`. If you go too overboard your game might fail to boot or just crash.)
+- (Optional) Add the keycode of your desired key after the multiplier to only speed up the game when holding down a key. (Sample config would look something like `2.0 0x01`. See https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes for a list of virtual keycodes)
 - Profit!
 
 ## Notes
