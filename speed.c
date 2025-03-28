@@ -107,12 +107,19 @@ void get_multiplier_from_file ( )
  if ( !f )
   return;
 
- int r = fscanf_s ( f, "%f", &g_mult );
- if ( r != 1 )
-  g_mult = 2.0f;
+ g_mult = 2.0f; // defaults first
+ g_async_key = 0;
 
- r = fscanf_s ( f, "%x", &g_async_key );
- if ( r != 1 )
+ if ( fscanf_s ( f, "%f", &g_mult ) == 1 )
+  if ( fscanf_s ( f, "%x", &g_async_key ) != 1 )
+   g_async_key = 0;
+
+ if ( g_mult < 0.0f )
+  g_mult = 0.0f;
+ if ( g_mult > 10.0f )
+  g_mult = 10.0f;
+
+ if ( g_async_key < 0 || g_async_key > 255 )
   g_async_key = 0;
 
  fclose ( f );
@@ -134,7 +141,9 @@ BOOL WINAPI hk_queryperfcounter ( LARGE_INTEGER *lpPerformanceCount )
  o_queryperfcounter ( &current_time );
 
  float mult = 1.f;
- if ( g_async_key && GetAsyncKeyState ( g_async_key ) )
+ if ( !g_async_key )
+  mult = g_mult;
+ else if ( g_async_key && GetAsyncKeyState ( g_async_key ) )
   mult = g_mult;
 
  LONGLONG real_delta = current_time.QuadPart - freq.QuadPart;
